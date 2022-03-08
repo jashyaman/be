@@ -17,6 +17,4 @@ const todoSchema = new mongoose.Schema({
 const TodoEntry = mongoose.model('todo', todoSchema);
 
 
-export default function() {
-    "TodoEntry" : TodoEntry
-}
+exports.TodoEntry = TodoEntry;

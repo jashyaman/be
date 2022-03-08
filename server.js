@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 var path = require('path');
-import schemas from "./db.js"
+var schemas = require("./db")
 
 
 app.use(express.static(path.join(__dirname, 'ui')));
@@ -21,18 +21,36 @@ app.get('/todo', (req, res) => {
     res.sendFile(__dirname+"/ui/html/todo.html")
 })
 
-app.post('/todo', (req, res) => {
+app.post('/api/todo', (req, res) => {
     let inputuname = req.body.uname,
         inputtaskname = req.body.taskname;
 
-        console.log(inputuname);;
-        console.log(inputtaskname);
+        // console.log(inputuname);;
+        // console.log(inputtaskname);
         
         let document = { "uname" : inputuname , "taskname" : inputtaskname }
         var todoEntry = new schemas.TodoEntry(document);
         todoEntry.save().then( () => console.log("entry added " + JSON.stringify(document) ) );
         res.send("entry added " + JSON.stringify(document))
 })
+
+app.put('/api/todo', (req, res) => {
+  let inputuname = req.body.uname;
+
+      // console.log(inputuname);;
+      
+      let document = { "uname" : inputuname }
+      var todoEntry = new schemas.TodoEntry(document);
+      
+      schemas.TodoEntry.find(document, (err, docs) => {
+        console.log("search result of " + JSON.stringify(document) + " is ");
+        if(err) {
+          console.error(err);
+        } else {
+          res.send(docs);
+        }
+      });   
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

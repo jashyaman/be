@@ -9,9 +9,12 @@ let addTaskBtn = document.getElementById("addTask");
 let greetingLabel = document.getElementById("greetingLbl");
 let statusMessage = document.getElementById("statusLbl");
 
+let todoTable = document.getElementById("todotable");
+
 div1.style.display = "block";
 div2.style.display = "none";
 var userOfApp = "";
+todoTable.style.display = "none";
 determinUserBtn.onclick = function() {
     let userStr = username.value;
     if(userStr) {
@@ -47,6 +50,8 @@ function reset() {
     username.value = ''
     taskName = '';
     greetingLabel.innerHTML = '';
+    todoTable.style.display = "none";
+
 }
 
 function submitTask(uname, taskname) {
@@ -56,9 +61,29 @@ function submitTask(uname, taskname) {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         statusLbl.innerHTML = this.responseText;
+        loadTodos(uname);
       }
     };
-    xhttp.open("POST", "http://localhost:3000/todo", true);
+    xhttp.open("POST", "http://localhost:3000/api/todo", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send("{ \"uname\" : \""+uname+"\" , \"taskname\": \""+taskname+"\"}");
+}
+
+function loadTodos(uname) {
+    console.log("loading todos");
+    if(uname) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            statusLbl.innerHTML = this.responseText;
+            todoTable.style.display = "block";
+          }
+        };
+        xhttp.open("PUT", "http://localhost:3000/api/todo", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send("{ \"uname\" : \""+uname+"\"}");
+    } else {
+        alert("error: username was not recorded. resetting");
+        reset();
+    }
 }
