@@ -12,7 +12,8 @@ mongoose.connect(
 
 const todoSchema = new mongoose.Schema({
     uname: String,
-    taskname: String
+    taskname: String,
+    done: Boolean
 });
 const TodoEntry = mongoose.model('todo', todoSchema);
 

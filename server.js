@@ -30,20 +30,23 @@ app.post('/api/todo', (req, res) => {
         
         let document = { "uname" : inputuname , "taskname" : inputtaskname }
         var todoEntry = new schemas.TodoEntry(document);
-        todoEntry.save().then( () => console.log("entry added " + JSON.stringify(document) ) );
-        res.send("entry added " + JSON.stringify(document))
-})
+        todoEntry.save().then(
+          (response) => {
+            //console.log("entry added " + JSON.stringify(document) + " " + response); 
+            res.send("entry processing " + JSON.stringify(document))
+          }, 
+          (err) => {
+              res.send("ERROR in entry processing " + err);            
+          }
+        );
+});
 
-app.put('/api/todo', (req, res) => {
+app.put('/api/todo/search', (req, res) => {
   let inputuname = req.body.uname;
-
       // console.log(inputuname);;
-      
-      let document = { "uname" : inputuname }
-      var todoEntry = new schemas.TodoEntry(document);
-      
+      let document = { "uname" : inputuname }   
       schemas.TodoEntry.find(document, (err, docs) => {
-        console.log("search result of " + JSON.stringify(document) + " is ");
+        //console.log("search result of " + JSON.stringify(document) + " is ");
         if(err) {
           console.error(err);
         } else {
@@ -51,6 +54,21 @@ app.put('/api/todo', (req, res) => {
         }
       });   
 });
+
+app.put('/api/todo', (req, res) => {
+  let requestBody = req.body;
+      const filter = { _id: requestBody._id };
+      const update = { uname: requestBody.uname, taskname: requestBody.taskname, done: requestBody.done };
+       schemas.TodoEntry.findOneAndUpdate(filter, update, (err, docs) => {
+        if(err) {
+          console.error(err);
+          res.send("fails " + err);
+        } else {
+          res.send("success")
+        }
+       });
+});
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
