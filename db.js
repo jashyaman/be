@@ -17,5 +17,11 @@ const todoSchema = new mongoose.Schema({
 });
 const TodoEntry = mongoose.model('todo', todoSchema);
 
+const userLoginSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+});
+const UserLogin = mongoose.model('userlogin', userLoginSchema);
 
 exports.TodoEntry = TodoEntry;
+exports.UserLogin = UserLogin;

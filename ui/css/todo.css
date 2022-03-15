@@ -17,3 +17,7 @@ table {
   .linethrough {
     text-decoration: line-through;
   }
+
+  #loginDialog {
+    width:50%;background-color:#F4FFEF;border:1px dotted black;
+  }

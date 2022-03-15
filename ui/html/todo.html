@@ -4,17 +4,34 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/todo.css">
     <title>Todo</title>
 </head>
 <body>
+    <dialog id="loginDialog"> 
+        <div>
+            <label>Enter Username : <input type="text" id="username1"></label>
+        </div>
+        <div>
+            <label>Enter Password : <input type="password" id="password"></label>
+        </div>
+        <div id="dialogboxMsg">
+
+        </div>
+        <div>
+            <button id="submitLogin">Login</button>
+            <button id="clearLogin">Clear</button>
+            <button id="closeLogin">Close</button>
+        </div>
+    </dialog>
+    
     <div id="determineuser">
-        <input type="text" id="username" placeholder="enter name">
-        <button id="determineUsername">find or create owner</button>
+        <button id="determineUsername">Login</button>
     </div>
     <div id="addtodos">
         <div>
-            <label id="greetingLbl"></label>
+            <label id="greetingLbl"></label> <button id="logoutBtn">logout</button>
         </div>
         <div>
             <input type="text" id="taskname" placeholder="enter task">
