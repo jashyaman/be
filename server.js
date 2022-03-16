@@ -25,6 +25,10 @@ app.get('/todo', (req, res) => {
     res.sendFile(__dirname+"/ui/html/todo.html")
 })
 
+app.get('/projmgr', (req, res) => {
+  res.sendFile(__dirname+"/ui/html/projmgr.html")
+})
+
 app.post('/api/todo', (req, res) => {
     let inputuname = req.body.uname,
         inputtaskname = req.body.taskname;
