@@ -8,23 +8,46 @@
     <link rel="stylesheet" type="text/css" href="css/projmgr.css">
 </head>
 <body>
-    <div>
-        login
+    <div id="logindiv">
+        <button id="logmein">Login</button>
+        <dialog id="loginDialog"> 
+            <div>
+                <label>Enter Username : <input type="text" id="username" value="shyam"></label>
+            </div>
+            <div>
+                <label>Enter Password : <input type="password" id="password" value="raman"></label>
+            </div>
+            <div id="dialogboxMsg">
+
+            </div>
+            <div>
+                <button id="submitLogin">Login</button>
+                <button id="clearLogin">Clear</button>
+                <button id="closeLogin">Close</button>
+            </div>
+        </dialog>
     </div>
-    <div>
-        create project
-    </div>
-    <div>
-        create module
-    </div>
-    <div>
-        create sub module
-    </div>
-    <div>
-        create task
-    </div>
-    <div>
-        create sub taskname
+    <div id="appdiv">
+        <div>
+            <label id="greetingLbl"></label> <button id="logoutBtn">logout</button>
+        </div>
+        <div class="row">
+            <div id="navbar" class="columnLeft" style="background-color:#aaa;">
+              <div>nav is empty</div>
+            </div>
+            <div class="columnRight" style="background-color:#bbb;">
+              <div>
+                  <button id="cproject">New Project</button>
+                  <button id="cmodule">New Module</button>
+                  <button id="csubmodule">New Sub Module</button>
+                  <button id="ctask">New Task</button>
+                  <button id="csubtask">New Sub Task</button>
+              </div>
+              <div id="workarea">
+                  
+              </div>
+            </div>
+        </div>
     </div>
     <script src="js/projmgr.js"></script>
 </body>

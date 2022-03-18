@@ -7,16 +7,21 @@ const verifyToken = (req, res, next) => {
     req.body.token || req.query.token || req.headers["x-access-token"];
 
   if (!token) {
+    console.log(req.url + " unauthorized access attempt " + new Date().toUTCString());
     return res.status(403).send("A token is required for authentication");
   }
   try {
+    //console.log(token);
+    //console.log(process.env.TOKEN_KEY);
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-    console.log(decoded);
+    //console.log(decoded);
     req.user = decoded;
   } catch (err) {
-    return res.status(401).send("Invalid Token");
+    //console.log(err);
+    //console.log(new Date().toUTCString());
+    return res.status(401).send("Invalid Token " + err + " " + new Date().toUTCString());
   }
-  console.log("calling next");
+  // console.log("calling next");
   return next();
 };
 

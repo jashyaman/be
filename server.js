@@ -3,18 +3,24 @@ const app = express()
 require("dotenv").config();
 var path = require('path');
 var schemas = require("./db")
+var auth = require("./auth");
 
 const jwt = require("jsonwebtoken");
 app.use(express.json({ limit: "50mb" }));
- var auth = require("./auth");
+ 
 const port = process.env.PORT
 
 app.use(express.static(path.join(__dirname, 'ui')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
+
+var todorouter = require('./todoRouter');
+app.use('/api/todo', todorouter);
+
+
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.redirect("/dashboard");
 })
 
 app.get('/dashboard', (req, res) => {
@@ -29,71 +35,161 @@ app.get('/projmgr', (req, res) => {
   res.sendFile(__dirname+"/ui/html/projmgr.html")
 })
 
-app.post('/api/todo', (req, res) => {
-    let inputuname = req.body.uname,
-        inputtaskname = req.body.taskname;
-        let document = { "uname" : inputuname , "taskname" : inputtaskname }
-        var todoEntry = new schemas.TodoEntry(document);
-        todoEntry.save().then(
-          (response) => {
-            res.send("entry processing " + JSON.stringify(document))
-          }, 
-          (err) => {
-              res.send("ERROR in entry processing " + err);         
-          }
-        );
-});
-
-app.delete("/api/todo/:id", auth, (req, res) => {
-  console.log(req.tokendetail);
-  var taskId = req.params['id']
-  var username = req.user.user_id;
-  console.log(username);
-  let filter = { "uname" : username, _id : taskId }
-  console.log(JSON.stringify(filter));
-  schemas.TodoEntry.deleteOne(filter, (err, response) => {
-    if(!err) {
-      res.send(JSON.stringify(response));
+// "module" : { "endpoint" : "/api/modules",  },
+//   "submodule" : { "endpoint" : "/api/submodules", },
+//   "task" : { "endpoint" : "/api/tasks", },
+//   "subtask" : { "endpoint" : "/api/subtasks" } }
+function determineFilter(filter, user) {
+  if(typeof filter == 'string') {
+    if(filter == "ownerName") {
+      return { "owner_name" : user}
     } else {
-      res.send("ERROR in entry processing " + err);
+      console.log("unrecognized filter field " + filter);
     }
-  })
+  } else {
+    console.log("unprocessable filter " + filter);
+  }
+}
+
+app.put("/api/dblist", auth, (req,res) => {
+  //console.log(req.body);
+  let collectionName = req.body.collection;
+  let schema = schemas.determineSchema(collectionName);
+  let filter = determineFilter(req.body.filter, req.user.user_id);
+  schema.find(filter,(err, docs) => { 
+    if(err) {
+      res.status(500).send(err);
+    } else {
+      //console.log(docs);
+      res.status(200).send(docs);
+    }
+  });
 })
 
-app.put('/api/todo/search', (req, res) => {
-  let inputuname = req.body.uname;
-      //  console.log(inputuname);
-      let document = { "uname" : inputuname }
-      let sortBy = { sort: { done : 1 }}
-      schemas.TodoEntry.find(document,["uname","taskname","done"], sortBy, (err, docs) => {
-        // console.log("search result of " + JSON.stringify(document) + " is ");
-        if(err) {
-          console.error(err);
-          res.status(500).send(err);
-        } else {
-          // console.log(docs);
-          res.status(200).send(docs);
-        }
-      });   
+
+app.get('/api/config/:type', auth, (req, res) => {
+  let filter = { "type" : req.params['type'] }
+  schemas.Configuration.find(filter, (err, docs) => {
+    if(err) {
+      res.status(500).send(err);
+    }
+    if(docs) {
+      res.status(200).send(docs);
+    } else {
+      res.status(404).send();
+    }
+  });
 });
 
-app.put('/api/todo', (req, res) => {
+app.post('/api/projects', (req, res) => {
   let requestBody = req.body;
-      const filter = { _id: requestBody._id };
-      const update = { uname: requestBody.uname, taskname: requestBody.taskname, done: requestBody.done };
-       schemas.TodoEntry.findOneAndUpdate(filter, update, (err, docs) => {
-        if(err) {
-          console.error(err);
-          res.send("fails " + err);
-        } else {
-          res.send("success")
-        }
-       });
+  let document = { "project_name" : requestBody.projectName,
+    "owner_name" : requestBody.ownername, 
+    "project_type" : requestBody.projectType };
+    let project = new schemas.Project(document);
+    project.save().then(
+      (response) => {
+        //console.log(response);
+        res.send("entry processing " + JSON.stringify(document))
+      }, 
+      (err) => {
+          res.send("ERROR in entry processing " + err);
+      }
+    );
 });
+
+app.post('/api/modules', (req, res) => {
+  let requestBody = req.body;
+  //console.log(requestBody);
+  let document = { "module_name" : requestBody.moduleName,
+    "owner_name" : requestBody.ownerName, 
+    "estimate" : requestBody.estimate,
+    "description" : requestBody.description,
+    "parent" : requestBody.projectName 
+  };
+  let model = new schemas.Module(document);
+     model.save().then(
+       (response) => {
+        //console.log(response);
+        res.send("entry processing " + JSON.stringify(document))
+      }, 
+      (err) => {
+          res.send("ERROR in entry processing " + err);
+      }
+    );
+});
+
+app.post('/api/submodules', (req, res) => {
+  let requestBody = req.body;
+  //console.log(requestBody);
+  let document = {
+    "submodule_name" : requestBody.submoduleName,
+    "owner_name" : requestBody.ownerName, 
+    "estimate" : requestBody.estimate,
+    "description" : requestBody.description,
+    "parent" : requestBody.moduleName 
+  }
+  let model = new schemas.Submodule(document);
+  model.save().then(
+    (response) => {
+     console.log(response);
+     res.send("entry processing " + JSON.stringify(document))
+   }, 
+   (err) => {
+       res.send("ERROR in entry processing " + err);
+   }
+ );
+});
+
+app.post('/api/tasks', (req, res) => {
+  let requestBody = req.body;
+  //console.log(requestBody);
+  let document = {
+    "task_name" : requestBody.taskName,
+    "owner_name" : requestBody.ownerName, 
+    "estimate" : requestBody.estimate,
+    "description" : requestBody.description,
+    "parent" : requestBody.submoduleName 
+  }
+  let model = new schemas.Task(document);
+  model.save().then(
+    (response) => {
+     console.log(response);
+     res.send("entry processing " + JSON.stringify(document))
+   }, 
+   (err) => {
+       res.send("ERROR in entry processing " + err);
+   }
+ );
+});
+
+app.post('/api/subtasks', (req, res) => {
+  let requestBody = req.body;
+  console.log(requestBody);
+  let document = {
+    "subtask_name" : requestBody.subTaskName,
+    "owner_name" : requestBody.ownerName, 
+    "estimate" : requestBody.estimate,
+    "description" : requestBody.description,
+    "parent" : requestBody.taskName 
+  }
+  let model = new schemas.Subtask(document);
+  model.save().then(
+    (response) => {
+     //console.log(response);
+     res.send("entry processing " + JSON.stringify(document))
+   }, 
+   (err) => {
+       res.send("ERROR in entry processing " + err);
+   }
+ );
+});
+
 
 app.put('/api/login', (req, res) => {
   let requestBody = req.body;
   let document = {"username" : requestBody.username, "password" : requestBody.password };
+  //console.log(document);
   schemas.UserLogin.find(document, (err, docs) => {
     if(err) {
       res.status(500)
@@ -102,7 +198,7 @@ app.put('/api/login', (req, res) => {
       if(docs) {
         if(docs.length == 1) {
           res.status(200);
-          const jwToken = jwt.sign({user_id: docs[0].username},process.env.TOKEN_KEY,{expiresIn: "120"});
+          let jwToken = jwt.sign({user_id: docs[0].username},process.env.TOKEN_KEY,{expiresIn: "1h"});
           res.send({ token : jwToken, username : docs[0].username});
         } else {
           res.status(401)

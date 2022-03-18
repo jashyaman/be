@@ -66,7 +66,7 @@ function submitTask(uname, taskname) {
   console.log(taskname);
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = onsubmitTaskCompleteFn;
-  xhttp.open("POST", "http://localhost:3000/api/todo", true);
+  xhttp.open("POST", "/api/todo", true);
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.setRequestHeader(
     "x-access-token",
@@ -139,7 +139,7 @@ function loadTodos() {
                         this.responseText;
                     }
                   };
-                  miniXhttp.open("PUT", "http://localhost:3000/api/todo", true);
+                  miniXhttp.open("PUT", "/api/todo", true);
                   miniXhttp.setRequestHeader("Content-type", "application/json");
                   miniXhttp.setRequestHeader(
                     "x-access-token",
@@ -170,7 +170,7 @@ function loadTodos() {
                   };
                   xhttp.open(
                     "DELETE",
-                    "http://localhost:3000/api/todo/" + taskId,
+                    "/api/todo/" + taskId,
                     true
                   );
                   xhttp.setRequestHeader("Content-type", "application/json");
@@ -200,7 +200,7 @@ function loadTodos() {
           //console.log("loading todos..." + this.readyState);
         }
       }
-    xhttp.open("PUT", "http://localhost:3000/api/todo/search", true);
+    xhttp.open("PUT", "/api/todo/search", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.setRequestHeader(
       "x-access-token",
@@ -264,7 +264,7 @@ function loginAttempt(userStr, passStr) {
       console.log("authenticating...");
     }
   };
-  xhttp.open("PUT", "http://localhost:3000/api/login", true);
+  xhttp.open("PUT", "/api/login", true);
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send(JSON.stringify({ username: userStr, password: passStr }));
 }
