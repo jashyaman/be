@@ -30,7 +30,7 @@ logoutBtn.onclick = () => { reset(); localStorage.clear(); };
 submitLogin.onclick = function () {
     let userStr = loginUsername.value,
       passStr = btoa(loginPassword.value);
-    //console.log(userStr + " " + passStr);
+    console.log(userStr + " " + passStr);
     if (userStr && passStr) {
       loginAttempt(userStr, passStr)
     } else {
@@ -44,8 +44,9 @@ function loginAttempt(userStr, passStr) {
     xhttp.onreadystatechange = function () {
       if (this.readyState == 4) {
         if (this.status == 200) {
-          //console.log(this.responseText + " successful login");
-          //console.log("successful login");
+          console.log(this.responseText + " successful login");
+          console.log("successful login");
+          
           localStorage.setItem(
             "x-access-token",
             JSON.parse(this.responseText).token
@@ -56,6 +57,7 @@ function loginAttempt(userStr, passStr) {
           greetingLabel.innerHTML = greetStr;
           div2.style.display = "block";
           dialog.close();
+          populateNavBar();
         } else {
           console.log(this.responseText + " invalid credentials");
           dialogboxMsg.innerHTML = "Invalid credentials";
@@ -84,6 +86,10 @@ function reset() {
     let workarea = document.getElementById("workarea");
     while(workarea.firstChild) {
       workarea.removeChild(workarea.firstChild);
+    }
+    let navbar = document.getElementById("navbar");
+    while(navbar.firstChild) {
+      navbar.removeChild(navbar.firstChild);
     }
   }
 
@@ -245,10 +251,91 @@ function reset() {
         if(this.readyState == 4) {
             if(this.status == 200) {
                 console.log(this.responseText);
+                populateNavBar();
             }
         }
     }
     while(workarea.firstChild) {
       workarea.removeChild(workarea.firstChild);
     }
+  }
+
+
+  function populateNavBar() {
+    let navbar = document.getElementById("navbar");
+    while(navbar.firstChild) {
+      navbar.removeChild(navbar.firstChild);
+    }
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/api/nav", true);
+    xhttp.setRequestHeader("x-access-token", localStorage.getItem("x-access-token"));
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4) {
+            if(this.status == 200) {
+                //console.log(this.responseText);
+                let list = JSON.parse(this.responseText);
+                list.forEach(project => {
+                  let projectdiv = document.createElement('div');
+                  let projectlabel = document.createElement("label");
+                  projectlabel.innerHTML = project.project_name;
+                  projectlabel.onclick = () => { viewDocument("project", project._id) }
+                  projectlabel.classList.add("module");
+                  projectdiv.appendChild(projectlabel);
+                  projectdiv.classList.add("project");
+                  project.modules.forEach(module => {
+                    let modulediv = document.createElement("div");
+                    let modulelabel = document.createElement("label");
+                    modulelabel.innerHTML = module.module_name;
+                    modulelabel.onclick = () => { viewDocument("module", module._id) }
+                    modulelabel.classList.add("module");
+                    modulediv.appendChild(modulelabel);
+                    modulediv.classList.add("module");
+                    project.submodules
+                    .filter(m => m.parent == module._id)
+                    .forEach(submodule => {
+                      let submodulediv = document.createElement("div");
+                      let submodulelabel = document.createElement("label");
+                      submodulelabel.innerHTML = submodule.submodule_name;
+                      submodulelabel.onclick = () => { viewDocument("submodule", submodule._id) }
+                      submodulelabel.classList.add("submodule");
+                      submodulediv.appendChild(submodulelabel);
+                      submodulediv.classList.add("submodule");
+                      project.tasks
+                      .filter(t => t.parent == submodule._id)
+                      .forEach(task =>{
+                         let taskdiv = document.createElement("div");
+                         let tasklabel = document.createElement("label");
+                         tasklabel.innerHTML = task.task_name;
+                         tasklabel.onclick = () => { viewDocument("task", task._id) }
+                         tasklabel.classList.add("task");
+                         taskdiv.appendChild(tasklabel);
+                         taskdiv.classList.add("task");
+                          project.subtasks
+                          .filter(st => st.parent == task._id)
+                          .forEach(subtask =>{
+                            let subtaskdiv = document.createElement("div");
+                            let subtasklabel = document.createElement("label");
+                            subtasklabel.innerHTML = subtask.subtask_name;
+                            subtasklabel.onclick = () => { viewDocument("subtask", subtask._id) }
+                            subtasklabel.classList.add("task");
+                            subtaskdiv.appendChild(subtasklabel);
+                            subtaskdiv.classList.add("subtask");
+                            taskdiv.appendChild(subtaskdiv);
+                          })
+                         submodulediv.appendChild(taskdiv);
+                       });
+                      modulediv.appendChild(submodulediv);
+                    });
+                    projectdiv.appendChild(modulediv);
+                  });
+                  navbar.appendChild(projectdiv)
+                });
+            }
+        }
+    }
+    xhttp.send();
+  }
+
+  function viewDocument(type, id) {
+    console.log("type " + type + " id " + id);
   }
