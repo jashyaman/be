@@ -1,5 +1,4 @@
 function navBarAggregation(username) {
-    console.log("here");
 return [
     {
       $match : {

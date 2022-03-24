@@ -5,6 +5,11 @@ const port = process.env.PORT;
 var path = require("path");
 
 var todorouter = require("./todoRouter");
+var projectrouter = require("./projectRouter");
+var modulerouter = require("./moduleRouter");
+var submodulerouter = require("./submoduleRouter");
+var taskrouter = require("./taskRouter");
+var subtaskrouter = require("./subtaskRouter");
 var schemas = require("./db");
 var auth = require("./auth");
 var aggregations = require("./aggregations");
@@ -18,6 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/api/todo", todorouter);
+app.use("/api/projects", projectrouter);
+app.use("/api/modules", modulerouter);
+app.use("/api/submodules", submodulerouter);
+app.use("/api/tasks", taskrouter);
+app.use("/api/subtasks", subtaskrouter);
 
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
@@ -78,112 +88,8 @@ app.get("/api/config/:type", auth, (req, res) => {
   });
 });
 
-app.post("/api/projects", (req, res) => {
-  let requestBody = req.body;
-  let document = {
-    project_name: requestBody.projectName,
-    owner_name: requestBody.ownerName,
-    project_type: requestBody.projectType,
-  };
-  let project = new schemas.Project(document);
-  project.save().then(
-    (response) => {
-      //console.log(response);
-      res.send("entry processing " + JSON.stringify(document));
-    },
-    (err) => {
-      res.send("ERROR in entry processing " + err);
-    }
-  );
-});
 
-app.post("/api/modules", (req, res) => {
-  let requestBody = req.body;
-  //console.log(requestBody);
-  let document = {
-    module_name: requestBody.moduleName,
-    owner_name: requestBody.ownerName,
-    estimate: requestBody.estimate,
-    description: requestBody.description,
-    parent: requestBody.projectName,
-  };
-  let model = new schemas.Module(document);
-  model.save().then(
-    (response) => {
-      //console.log(response);
-      res.send("entry processing " + JSON.stringify(document));
-    },
-    (err) => {
-      res.send("ERROR in entry processing " + err);
-    }
-  );
-});
 
-app.post("/api/submodules", (req, res) => {
-  let requestBody = req.body;
-  //console.log(requestBody);
-  let document = {
-    submodule_name: requestBody.submoduleName,
-    owner_name: requestBody.ownerName,
-    estimate: requestBody.estimate,
-    description: requestBody.description,
-    parent: requestBody.moduleName,
-  };
-  let model = new schemas.Submodule(document);
-  model.save().then(
-    (response) => {
-      //console.log(response);
-      res.send("entry processing " + JSON.stringify(document));
-    },
-    (err) => {
-      res.send("ERROR in entry processing " + err);
-    }
-  );
-});
-
-app.post("/api/tasks", (req, res) => {
-  let requestBody = req.body;
-  //console.log(requestBody);
-  let document = {
-    task_name: requestBody.taskName,
-    owner_name: requestBody.ownerName,
-    estimate: requestBody.estimate,
-    description: requestBody.description,
-    parent: requestBody.submoduleName,
-  };
-  let model = new schemas.Task(document);
-  model.save().then(
-    (response) => {
-      //console.log(response);
-      res.send("entry processing " + JSON.stringify(document));
-    },
-    (err) => {
-      res.send("ERROR in entry processing " + err);
-    }
-  );
-});
-
-app.post("/api/subtasks", (req, res) => {
-  let requestBody = req.body;
-  console.log(requestBody);
-  let document = {
-    subtask_name: requestBody.subTaskName,
-    owner_name: requestBody.ownerName,
-    estimate: requestBody.estimate,
-    description: requestBody.description,
-    parent: requestBody.taskName,
-  };
-  let model = new schemas.Subtask(document);
-  model.save().then(
-    (response) => {
-      //console.log(response);
-      res.send("entry processing " + JSON.stringify(document));
-    },
-    (err) => {
-      res.send("ERROR in entry processing " + err);
-    }
-  );
-});
 
 app.put("/api/login", (req, res) => {
   let requestBody = req.body;
@@ -221,7 +127,7 @@ app.put("/api/login", (req, res) => {
 app.get("/api/nav", auth, (req, res) => {
   let navbarList = [];
   let username = req.user.user_id;
-  console.log(username);
+  //console.log(username);
   schemas.Project.aggregate(
     aggregations(username)
   ).exec( (err, docs)=> {
@@ -229,7 +135,7 @@ app.get("/api/nav", auth, (req, res) => {
       console.log(err);
       res.send(err);
     }
-    console.log(docs);
+    //console.log(docs);
     res.send(docs);
   })
   

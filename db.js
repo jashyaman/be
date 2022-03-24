@@ -1,6 +1,7 @@
 require("dotenv").config(); 
 const mongoose = require("mongoose");
 const mongoUrl = process.env.MONGODB_URL;
+
 mongoose.connect(
     mongoUrl, 
     {
@@ -32,7 +33,8 @@ const Configuration = mongoose.model('configuration', configSchema);
 const projectSchema = new mongoose.Schema({
     project_name: String,
     owner_name: String,
-    project_type: String
+    project_type: String,
+    complete: Boolean
 })
 const Project = mongoose.model('project', projectSchema);
 
@@ -41,7 +43,11 @@ const moduleSchema = new mongoose.Schema({
     estimate: String,
     description: String,
     owner_name: String,
-    parent: String
+    parent: String,
+    complete: {
+      type: Boolean,
+      default: false
+    }
 })
 const Module = mongoose.model('module', moduleSchema);
 
@@ -50,7 +56,11 @@ const submoduleSchema = new mongoose.Schema({
     estimate: String,
     description: String,
     owner_name: String,
-    parent: String
+    parent: String,
+    complete: {
+      type: Boolean,
+      default: false
+    }
 })
 const Submodule = mongoose.model('submodule', submoduleSchema);
 
@@ -59,7 +69,11 @@ const taskSchema = new mongoose.Schema({
     estimate: String,
     description: String,
     owner_name: String,
-    parent: String
+    parent: String,
+    complete: {
+      type: Boolean,
+      default: false
+    }
 })
 const Task = mongoose.model('task', taskSchema);
 
@@ -68,7 +82,11 @@ const subtaskSchema = new mongoose.Schema({
     estimate: String,
     description: String,
     owner_name: String,
-    parent: String
+    parent: String,
+    complete: {
+      type: Boolean,
+      default: false
+    }
 })
 const Subtask = mongoose.model('subtask', subtaskSchema);
 
@@ -100,4 +118,4 @@ exports.Module = Module;
 exports.Submodule = Submodule;
 exports.Task = Task;
 exports.Subtask = Subtask;
-exports.determineSchema = determineSchemaFn
+exports.determineSchema = determineSchemaFn;
