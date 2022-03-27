@@ -4,17 +4,18 @@
 
 * {
   box-sizing: border-box;
+  background-color: gray;
 }
 
 .row {
   display: flex;
 }
 .columnLeft {
-  flex: 25%;
+  flex: 30%;
   padding: 10px;
 }
 .columnRight {
-  flex: 75%;
+  flex: 70%;
   padding: 10px;
 }
 
@@ -122,4 +123,11 @@ div.subtask {
   text-align: left;
   background-color: black;
   color: white;
+}
+
+td.hover:hover {
+  color: #0099da;
+  background: #d0d0d0;
+  border: 0.5px solid #e1e1e1;
+  cursor: pointer;
 }

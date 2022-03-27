@@ -30,6 +30,7 @@ clearLogin.onclick = () => {
 logoutBtn.onclick = () => {
   reset();
   localStorage.clear();
+  greetingLabel.innerHTML = "logout successful";
 };
 
 submitLogin.onclick = function () {
@@ -63,8 +64,9 @@ function loginAttempt(userStr, passStr) {
         div2.style.display = "block";
         dialog.close();
         populateNavBar();
+        greetingLabel.innerHTML = "login successful";
       } else {
-        console.log(this.responseText + " invalid credentials");
+      //  console.log(this.responseText + " invalid credentials");
         dialogboxMsg.innerHTML = "Invalid credentials";
         loginUsername.value = "";
         loginPassword.value = "";
@@ -110,31 +112,36 @@ let metadata = {
     type: "project",
     endpoint: "/api/projects",
     "config-endpoint": "/api/config/cproject",
-    parent: "none"
+    parent: "none",
+    parentType: "none",
   },
   module: {
     type: "module",
     endpoint: "/api/modules",
     "config-endpoint": "/api/config/cmodule",
-    parent: "project_name" 
+    parent: "project_name",
+    parentType: "project",
   },
   submodule: {
     type: "submodule",
     endpoint: "/api/submodules",
     "config-endpoint": "/api/config/csubmodule",
     parent: "module_name",
+    parentType: "module",
   },
   task: {
     type: "task",
     endpoint: "/api/tasks",
     "config-endpoint": "/api/config/ctask",
     parent: "submodule_name",
+    parentType: "submodule",
   },
   subtask: {
     type: "subtask",
     endpoint: "/api/subtasks",
     "config-endpoint": "/api/config/csubtask",
     parent: "task_name",
+    parentType: "task",
   },
 };
 let sourceType = {};
@@ -166,7 +173,7 @@ csubtask.onclick = function () {
   formElementConfigLookup();
 };
 
-function formElementConfigLookup() {
+function formElementConfigLookup(editedObj) {
   var xhttp = new XMLHttpRequest();
   xhttp.open("GET", sourceType["config-endpoint"], true);
   xhttp.setRequestHeader(
@@ -179,14 +186,14 @@ function formElementConfigLookup() {
     if (this.readyState == 4) {
       if (this.status == 200) {
         let data = JSON.parse(this.responseText);
-        createForm(data);
+        createForm(data, editedObj);
         fieldsMeta = data[0].data.fields;
       }
     }
   };
 }
 
-async function createForm(data) {
+async function createForm(data, editedObj) {
   let divOuter = document.createElement("div");
   divOuter.classList.add("form");
   let fields = data[0].data.fields;
@@ -247,26 +254,88 @@ async function createForm(data) {
     } else {
       console.log("unrecognized type " + elem.type);
     }
+    if (editedObj) {
+      if (elem.type == "String" || elem.type == "list") {
+        inputField.value = editedObj[elem.name];
+      } else if (elem.type == "dblist") {
+        //        console.log(editedObj);
+        inputField.value = editedObj["parent"];
+      }
+    } else {
+      if (elem.type == "String" && elem.name == "owner_name") {
+        //console.log(localStorage.getItem("x-access-token"));
+        let jwtToken = localStorage.getItem("x-access-token");
+        let tokenBody = parseToken(jwtToken);
+        inputField.value = tokenBody["user_id"];
+      }
+    }
     divEnclosing.appendChild(labelField);
     divEnclosing.appendChild(inputField);
     divOuter.appendChild(divEnclosing);
   }
 
   let submitBtn = document.createElement("input");
-  submitBtn.value = "submit form";
-  submitBtn.type = "button";
-  submitBtn.onclick = onFormSubmit;
   divOuter.appendChild(submitBtn);
+  submitBtn.type = "button";
+  if (editedObj) {
+    submitBtn.value = "update";
+    submitBtn.onclick = function () {
+      onFormUpdate(editedObj);
+    };
+  } else {
+    submitBtn.value = "submit form";
+    submitBtn.onclick = onFormSubmit;
+  }
+
   while (workarea.firstChild) {
     workarea.removeChild(workarea.firstChild);
   }
   workarea.appendChild(divOuter);
 }
 
+function onFormUpdate(doc) {
+  let editedObj = {};
+  fieldsMeta.forEach((field) => {
+    //    console.log(field.name);
+    let elem = document.getElementById(field.name);
+    if (
+      field.type == "String" ||
+      field.type == "list" ||
+      field.type == "dblist"
+    ) {
+      editedObj[field.name] = elem.value;
+    } else {
+      console.log("unknown type " + field.type);
+    }
+  });
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", sourceType["endpoint"] + "/" + doc["_id"], true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.setRequestHeader(
+    "x-access-token",
+    localStorage.getItem("x-access-token")
+  );
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        //console.log("after update");
+        //console.log(this.responseText);
+        populateNavBar();
+        alert("updated");
+        greetingLabel.innerHTML = "update complete";
+      }
+    }
+  };
+  xhttp.send(JSON.stringify(editedObj));
+  while (workarea.firstChild) {
+    workarea.removeChild(workarea.firstChild);
+  }
+}
+
 function onFormSubmit() {
   let formDataObj = {};
   fieldsMeta.forEach((field) => {
-    console.log(field.name);
+    //console.log(field.name);
     let elem = document.getElementById(field.name);
     if (
       field.type == "String" ||
@@ -290,7 +359,8 @@ function onFormSubmit() {
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        console.log(this.responseText);
+        //console.log(this.responseText);
+        greetingLabel.innerHTML = "create successful";
         populateNavBar();
       }
     }
@@ -389,7 +459,7 @@ function populateNavBar() {
 }
 
 function viewDocument(type, id) {
-  console.log("type " + type + " id " + id);
+  //console.log("type " + type + " id " + id);
   sourceType = metadata[type];
   var xhttp = new XMLHttpRequest();
   xhttp.open("GET", sourceType["endpoint"] + "/" + id, true);
@@ -416,25 +486,28 @@ function createDataTable(doc) {
 
   let keys = Object.keys(doc);
   let keysToRemove = ["_id", "complete", "parentName", "parentRec", "parentId"];
-  keysToRemove.forEach(key => {
+  keysToRemove.forEach((key) => {
     let i = keys.indexOf(key);
     if (i != -1) {
       keys.splice(i, 1);
-    }  
-  })
-  if(doc["parentRec"]) {
-    doc["parent"] = doc["parentRec"][0][sourceType["parent"]];
-  } else {
-    doc["parent"] = "not defined"
-  }
+    }
+  });
   for (let i = 0; i < keys.length; i++) {
     let tr = document.createElement("tr");
     let th = document.createElement("th");
     th.innerHTML = keys[i];
     tr.appendChild(th);
     let td = document.createElement("td");
-    if(keys[i] == "parent") {
-      td.innerHTML = doc["parent"];
+    if (keys[i] == "parent") {
+      if (doc["parentRec"]) {
+        td.innerHTML = doc["parentRec"][0][sourceType["parent"]];
+      } else {
+        td.innerHTML = "not defined";
+      }
+      td.classList.add("hover");
+      td.onclick = () => {
+        viewDocument(sourceType.parentType, doc["parentId"]);
+      };
     } else {
       td.innerHTML = doc[keys[i]];
     }
@@ -447,34 +520,11 @@ function createDataTable(doc) {
   tr.appendChild(th);
   let chk = document.createElement("td");
   let chkbox = document.createElement("input");
+  chkbox.id = doc["_id"];
   chkbox.value = doc["_id"];
   chkbox.type = "checkbox";
   chkbox.checked = doc["complete"];
-  chkbox.onchange = function () {
-    doc["complete"] = chkbox.checked;
-    let document = {}
-    document["project_name"] = doc["project_name"];
-    document["project_type"] = doc["project_type"];
-    document["owner_name"] = doc["owner_name"];
-    document["complete"] = doc["complete"];
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("PUT", sourceType["endpoint"] + "/" + doc["_id"], true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.setRequestHeader(
-      "x-access-token",
-      localStorage.getItem("x-access-token")
-    );
-    xhttp.onreadystatechange = function () {
-      if (this.readyState == 4) {
-        if (this.status == 200) {
-          //console.log("after update");
-          //console.log(this.responseText);
-        }
-      }
-    };
-    xhttp.send(JSON.stringify(document));
-  };
-  
+  chkbox.onchange = function() { doc["complete"] = chkbox.checked; onMarkComplete(doc); };
   chk.appendChild(chkbox);
   tr.appendChild(chk);
   table.appendChild(tr);
@@ -482,4 +532,108 @@ function createDataTable(doc) {
     workarea.removeChild(workarea.firstChild);
   }
   workarea.appendChild(table);
+  let editBtn = document.createElement("button");
+  editBtn.onclick = function () {
+    //console.log("editing record with id " + doc["_id"]);
+    while (workarea.firstChild) {
+      workarea.removeChild(workarea.firstChild);
+    }
+    formElementConfigLookup(doc);
+  };
+  editBtn.innerText = "Edit " + sourceType["type"];
+  workarea.appendChild(editBtn);
+
+  let deleteBtn = document.createElement("button");
+  deleteBtn.innerText = "Delete " + sourceType["type"];
+  deleteBtn.onclick = function () {
+    //console.log("deleting record with id " + doc["_id"]);
+    let choice = confirm(
+      "Are you sure you want to delete " +
+        sourceType["type"] +
+        " (" +
+        doc[sourceType["type"] + "_name"] +
+        ") ?"
+    );
+    if (choice) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("DELETE", sourceType["endpoint"] + "/" + doc["_id"], true);
+      xhttp.setRequestHeader("Content-type", "application/json");
+      xhttp.setRequestHeader(
+        "x-access-token",
+        localStorage.getItem("x-access-token")
+      );
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+            alert("delete successful");
+            while (workarea.firstChild) {
+              workarea.removeChild(workarea.firstChild);
+            }
+            populateNavBar();
+          } else if (this.status == 409) {
+            // conflict
+            let responseJson = JSON.parse(this.responseText);
+            //console.log("after delete attempt");
+            //console.log(responseJson);
+            alert(
+              "delete unsuccessful\n" + "reason: " + responseJson["reason"]
+            );
+          }
+        }
+      };
+      xhttp.send();
+    }
+  };
+  workarea.appendChild(deleteBtn);
+}
+
+function parseToken(token) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+  //console.log(jsonPayload);
+  return JSON.parse(jsonPayload);
+}
+
+function onMarkComplete(doc) {
+  let chkbox = document.getElementById(doc["_id"]);
+  let editedObj = {};
+  editedObj["complete"] = doc["complete"];
+  xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", sourceType["endpoint"] + "/" + doc["_id"], true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.setRequestHeader(
+    "x-access-token",
+    localStorage.getItem("x-access-token")
+  );
+  xhttp.send(JSON.stringify(editedObj));
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        let responseJson = JSON.parse(this.responseText);
+       // console.log("after update");
+      //  console.log(responseJson);
+        greetingLabel.innerHTML = "update successful";
+      } else if (this.status == 409) {
+        // conflict
+        let responseJson = JSON.parse(this.responseText);
+        // console.log("after update");
+        // console.log(responseJson);
+        alert(
+          "unable to mark as 'complete'\n" +
+            "reason: " + responseJson["reasons"]
+        );
+        
+        chkbox.checked = false;
+        greetingLabel.innerHTML = "update unsuccessful";
+      }
+    }
+  };
 }
