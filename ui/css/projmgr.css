@@ -1,19 +1,21 @@
 #loginDialog {
-    width:50%;background-color:#F4FFEF;border:1px dotted black;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  
+  width:50%;background-color:#F4FFEF;border:1px dotted black;
+}
+
+* {
+  box-sizing: border-box;
+  background-color: gray;
+}
+
 .row {
   display: flex;
 }
 .columnLeft {
-  flex: 10%;
+  flex: 30%;
   padding: 10px;
 }
 .columnRight {
-  flex: 90%;
+  flex: 70%;
   padding: 10px;
 }
 
@@ -47,4 +49,85 @@ div.form {
   border-radius: 5px;
   background-color: #f2f2f2;
   padding: 20px;
+}
+
+label.project:hover {
+  background: #e1e1e1;
+  border: 0.5px solid #d0d0d0;
+}
+div.project {
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+label.module:hover {
+  background: #e1e1e1;
+  border: 0.5px solid #d0d0d0;
+}
+div.module {
+  margin-left: 10px;
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+
+label.submodule:hover {
+  background: #d0d0d0;
+  border: 0.5px solid #e1e1e1;
+}
+div.submodule {
+  margin-left: 10px;
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+label.task:hover {
+  background: #d0d0d0;
+  border: 0.5px solid #e1e1e1;
+}
+div.task {
+  margin-left: 10px;
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+label.subtask:hover {
+  background: #d0d0d0;
+  border: 0.5px solid #e1e1e1;
+}
+div.subtask {
+  margin-left: 10px;
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table td, .table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.table tr:nth-child(even){background-color: #f2f2f2;}
+
+.table tr:hover {background-color: rgb(116, 62, 62); color: white;}
+
+.table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: black;
+  color: white;
+}
+
+td.hover:hover {
+  color: #0099da;
+  background: #d0d0d0;
+  border: 0.5px solid #e1e1e1;
+  cursor: pointer;
 }
