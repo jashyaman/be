@@ -5,12 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "start": "cp /var/tmp/.env /app;node --unhandled-rejections=strict server.js"
-=======
     "start": "node --unhandled-rejections=strict server.js",
     "autoreload": "nodemon server.js"
->>>>>>> 4785c313475cfc65a5dea0ed54c82ed63d083cbe
   },
   "keywords": [],
   "author": "",

@@ -479,6 +479,11 @@ function viewDocument(type, id) {
   xhttp.send();
 }
 
+function displayName(value) {
+  if(value.indexOf("_") == -1) return value[0].toUpperCase() + value.substring(1);
+  return value.split("_").map(word => word[0].toUpperCase() + word.substring(1)).toString().replaceAll(","," ")
+}
+
 function createDataTable(doc) {
   let workarea = document.getElementById("workarea");
   let table = document.createElement("table");
@@ -495,7 +500,7 @@ function createDataTable(doc) {
   for (let i = 0; i < keys.length; i++) {
     let tr = document.createElement("tr");
     let th = document.createElement("th");
-    th.innerHTML = keys[i];
+    th.innerHTML = displayName(keys[i]);
     tr.appendChild(th);
     let td = document.createElement("td");
     if (keys[i] == "parent") {
