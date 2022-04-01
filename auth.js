@@ -17,8 +17,8 @@ const verifyToken = (req, res, next) => {
     //console.log(decoded);
     req.user = decoded;
   } catch (err) {
-    //console.log(err);
-    //console.log(new Date().toUTCString());
+    console.log(err);
+    console.log(new Date().toUTCString());
     return res.status(401).send("Invalid Token " + err + " " + new Date().toUTCString());
   }
   // console.log("calling next");

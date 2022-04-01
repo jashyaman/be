@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" href="/css/journal.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Journal</title>
+</head>
+<body>
+    <div id="overlay" class="overlay hide">
+        <div id="logindialog" class="center">
+            <div class="logintitle">
+                Login
+            </div>
+            <div>
+                <label>Username : </label>
+                <input type="text" id="username" placeholder="enter username">
+            </div>
+            <div>
+                <label>Password : </label>
+                <input type="password" id="password" placeholder="enter password">
+            </div>
+            <div id="dialogboxMsg">
+
+            </div>
+            <div>
+                <button id="submit">Submit</button>
+                <button id="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="divontop" class="topbg">
+        <button id="loginBtn">Login</button>
+        <label id="greetingLabel"></label>
+        <button id="logoutBtn">Logout</button>
+    </div>
+    <div id="divbelow">
+        <div class="flexboxmain">
+            <div id="divleft">no entries</div>
+            <div id="divright">
+                <div>
+                    <img src="/assets/new.png" alt="" id="newEntry" class="newEntry" >
+                </div>
+                <div id="journalbody">
+                <div id="createJournaldiv" class="createJournaldiv">
+                    <div class="flexboxmain">
+                        <div>
+                            <input type="text" placeholder="Title" id="journalTitle">
+                        </div>
+                        <div>
+                            <input type="date" id="journalDate" value="2013-01-08">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="moodSelector1">Before Entry</label>
+                        <select id="moodSelector1">
+                            <option name="m1" value="elated">elated</option>
+                            <option name="m1" value="happy">happy</option>
+                            <option name="m1" value="neutral">neutral</option>
+                            <option name="m1" value="sad">sad</option>
+                            <option name="m1" value="very sad">very sad</option>
+                            <option name="m1" value="angry">angry</option>
+                            <option name="m1" value="frustrated">frustrated</option>
+                            <option name="m1" value="disinterested">disinterested</option>
+                            <option name="m1" value="jealous">jealous</option>
+                            <option name="m1" value="disappointed">disappointed</option>
+                            <option name="m1" value="relieved">relieved</option>
+                            <option name="m1" value="nervous">nervous</option>
+                            <option name="m1" value="surprised">surprised</option>
+                            <option name="m1" value="shocked">shocked</option>
+                            <option name="m1" value="tired">tired</option>
+                            <option name="m1" value="hungry">hungry</option>
+                            <option name="m1" value="suspicious">suspicious</option>
+                            <option name="m1" value="uncomfortable">uncomfortable</option>
+                            <option name="m1" value="undecided">undecided</option>
+                            <option name="m1" value="embarrassed">embarrassed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <textarea id="journalEntry"  rows="30"></textarea>
+                    </div>
+                    <div>
+                        <label for="moodSelector2">After Entry</label>
+                        <select id="moodSelector2">
+                            <option name="m2" value="elated">elated</option>
+                            <option name="m2" value="happy">happy</option>
+                            <option name="m2" value="neutral">neutral</option>
+                            <option name="m2" value="sad">sad</option>
+                            <option name="m2" value="very sad">very sad</option>
+                            <option name="m2" value="angry">angry</option>
+                            <option name="m2" value="frustrated">frustrated</option>
+                            <option name="m2" value="disinterested">disinterested</option>
+                            <option name="m2" value="jealous">jealous</option>
+                            <option name="m2" value="disappointed">disappointed</option>
+                            <option name="m2" value="relieved">relieved</option>
+                            <option name="m2" value="nervous">nervous</option>
+                            <option name="m2" value="surprised">surprised</option>
+                            <option name="m2" value="shocked">shocked</option>
+                            <option name="m2" value="tired">tired</option>
+                            <option name="m2" value="hungry">hungry</option>
+                            <option name="m2" value="suspicious">suspicious</option>
+                            <option name="m2" value="uncomfortable">uncomfortable</option>
+                            <option name="m2" value="undecided">undecided</option>
+                            <option name="m2" value="embarrassed">embarrassed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div>tags: <input type="text" placeholder="tags" id="tag"></div>
+                        <div id="taglist"></div>
+                    </div>
+                    <div>
+                        <button id="submitEntry">Submit</button>
+                        <button id="clearEntry">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    </div>
+    <script src="/js/journal.js" rel="stylesheet"></script>
+</body>
+</html>

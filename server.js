@@ -10,6 +10,7 @@ var modulerouter = require("./moduleRouter");
 var submodulerouter = require("./submoduleRouter");
 var taskrouter = require("./taskRouter");
 var subtaskrouter = require("./subtaskRouter");
+var journalRouter = require("./journalRouter");
 var schemas = require("./db");
 var auth = require("./auth");
 var aggregations = require("./aggregations");
@@ -28,6 +29,7 @@ app.use("/api/modules", modulerouter);
 app.use("/api/submodules", submodulerouter);
 app.use("/api/tasks", taskrouter);
 app.use("/api/subtasks", subtaskrouter);
+app.use("/api/journal", journalRouter);
 
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
@@ -44,6 +46,10 @@ app.get("/todo", (req, res) => {
 app.get("/projmgr", (req, res) => {
   res.sendFile(__dirname + "/ui/html/projmgr.html");
 });
+
+app.get("/journal", (req, res) => {
+  res.sendFile(__dirname + "/ui/html/journal.html");
+})
 
 
 
@@ -88,10 +94,8 @@ app.get("/api/config/:type", auth, (req, res) => {
   });
 });
 
-
-
-
 app.put("/api/login", (req, res) => {
+  // console.log(req.body);
   let requestBody = req.body;
   let document = {
     username: requestBody.username,
@@ -103,22 +107,17 @@ app.put("/api/login", (req, res) => {
       res.status(500);
       res.send("unexpected error " + err);
     } else {
-      if (docs) {
-        if (docs.length == 1) {
-          res.status(200);
-          let jwToken = jwt.sign(
-            { user_id: docs[0].username },
-            process.env.TOKEN_KEY,
-            { expiresIn: "1h" }
-          );
-          res.send({ token: jwToken, username: docs[0].username });
-        } else {
-          res.status(401);
-          res.send("unauthorized");
-        }
+      if (docs && docs.length == 1) {
+        res.status(200);
+        let jwToken = jwt.sign(
+          { user_id: docs[0].username },
+          process.env.TOKEN_KEY,
+          { expiresIn: "1h" }
+        );
+        res.send({ token: jwToken, username: docs[0].username });
       } else {
         res.status(401);
-        res.send("unauthorized");
+        res.send("no user found");
       }
     }
   });

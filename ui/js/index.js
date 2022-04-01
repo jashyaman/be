@@ -9,3 +9,6 @@ projmgrBtn.onclick = function() {
     window.location.replace('http://localhost:3000/projmgr');
 }
 
+journalBtn.onclick = function() {
+    window.location.replace("/journal")
+}

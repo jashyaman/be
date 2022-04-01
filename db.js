@@ -90,6 +90,18 @@ const subtaskSchema = new mongoose.Schema({
 })
 const Subtask = mongoose.model('subtask', subtaskSchema);
 
+const journalSchema = new mongoose.Schema({
+  title: String, 
+  entry: String,
+  dateOf: String,
+  emoBefore: String,
+  emoAfter: String,
+  tags: Array,
+  author: String
+});
+
+const Journal = mongoose.model('journal', journalSchema);
+
 let determineSchemaFn = (collection) => {
     switch(collection) {
       case "projects":
@@ -119,3 +131,4 @@ exports.Submodule = Submodule;
 exports.Task = Task;
 exports.Subtask = Subtask;
 exports.determineSchema = determineSchemaFn;
+exports.Journal = Journal;

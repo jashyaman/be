@@ -1,0 +1,79 @@
+.flexboxmain {
+    display: flex;
+    align-items: stretch;
+}
+.topbg {
+    background-color: gray;
+    width: 100%;
+}
+#divleft {
+    width: 30%;
+    background-color: lightcoral;
+}
+#divright {
+    background-color: lightsalmon;
+    width: 70%;
+}
+.overlay {
+    width: 99%;
+    height: 98%;
+    opacity: 0.9;
+    background-color: #000;
+    position: fixed
+}
+.center {
+    left:40%;
+    background-color: white;
+    color: black;
+    padding: 10px;
+    position: fixed;
+    top: 40%;
+}
+
+.logintitle {
+    background-color: green;
+    color: white;
+    width: 100%;
+}
+.newEntry {
+    height:15px;
+    width:15px;
+    cursor: pointer;
+    
+}
+#journalEntry {
+    width: 95%;
+}
+
+.act:hover {
+    background-color: #5c725d;
+    border: 0.5px solid #000;
+}
+
+.disptable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+
+
+.disptable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .disptable td, .disptable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .disptable tr:hover {background-color: #ddd;}
+  
+  .disptable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #04AA6D;
+    color: white;
+  }
